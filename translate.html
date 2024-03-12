@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>My Website</title>
+    <!-- <link rel="stylesheet" href="./style.css"> -->
+    <!-- <link rel="icon" href="./favicon.ico" type="image/x-icon"> -->
+  </head>
+  <body>
+    <main>
+        <h1>Translation - NLLB</h1>  
+        <textarea id="input" name="input" rows="10" cols="100"></textarea>
+        <button id="submit"> Submit </button>
+        <div>
+          <label> Source Language: </label><select name="src" id="src"></select>
+        </div>
+        <div>
+          <label> Target Language: </label><select name="tgt" id="tgt"></select>
+        </div>
+        <p id="status"></p>
+        <p id="translation"></p>
+    </main>
+	<script type="module">
+        // https://github.com/facebookresearch/flores?tab=readme-ov-file
+        let dict = {
+          English : "eng_Latn",
+          Indonesian : "ind_Latn",
+          Spanish : "spa_Latn",
+          German : "deu_Latn",
+          French : "fra_Latn"
+        };
+        const src = document.getElementById('src');
+        const tgt = document.getElementById('tgt');
+        for (let [key, value] of Object.entries(dict)){
+          var opt = document.createElement('option');
+          opt.value = value;
+          opt.innerHTML = key;
+          var opt1 = document.createElement('option');
+          opt1.value = value;
+          opt1.innerHTML = key;
+          src.appendChild(opt);
+          tgt.appendChild(opt1);
+        }
+        const status = document.getElementById('status');
+        
+        status.textContent = "fetching model.."
+        
+        import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.0";
+        env.allowLocalModels = false;
+        const translator = await pipeline('translation', 'Xenova/nllb-200-distilled-600M');
+        status.textContent = "model fetched"
+
+
+        const button = document.getElementById('submit');
+        const text = document.getElementById('input');
+        const translation = document.getElementById('translation');
+
+        button.addEventListener('click', async function (e) {
+            // console.log(text.value)
+            translation.textContent = "Loading..."
+            console.log("loading...")
+            let result = await translator (text.value, {src_lang: src.value, tgt_lang: tgt.value});
+            // console.log(result)/
+            // console.log(result)
+            translation.textContent = result[0]['translation_text']
+        })
+    </script>
+  </body>
+</html>
